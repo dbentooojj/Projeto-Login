@@ -1,13 +1,38 @@
 <?php
 
-    include("conexao.php");
+    include('conexao.php');
 
-    if (isset($_POST['enviar'])) {
-        $user = $_POST['usuario'];
-        $pass = $_POST['senha'];
+    if(isset($_POST['email']) || isset($_POST['senha'])) {
 
-        $result = mysqli_query($conect, "INSERT INTO usuarios(user,pass) VALUES ('$user', '$pass')");
+        if(strlen($_POST['email']) == 0) {
+            echo "Preencha seu e-mail";
+        } else if(strlen($_POST['senha']) == 0) {
+            echo "Preencha sua senha";
+        } else {
+            $email = $mysqli->real_escape_string($_POST['email']);
+            $senha = $mysqli->real_escape_string($_POST['senha']);
 
+            $sql_code = "SELECT * FROM usuarios WHERE  email = '$email' AND senha = 'senha'";
+            $sql_query = $mysqli->query($sql_code) or die("Falha na execuçao do código SQL: " . $mysqli->error);
+
+            $quantidade = $sql_query->num_rows;
+
+            if($quantidade == 1) {
+                $usuario = $sql_query->fetch_assoc();
+
+                if(!isset($_SESSION)) {
+                    session_start();
+                }
+
+                $_SESSION['email'] = $usuario['email'];
+                $_SESSION['senha'] = $usuario['senha'];
+
+                
+
+            } else {
+                echo "Usuário não encontrado";
+            }
+        }
     }
 
 ?>
